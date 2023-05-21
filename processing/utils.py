@@ -30,12 +30,12 @@ def perform_processing(image: np.ndarray) -> str:
         # filtering image
         #img_gray = cv.GaussianBlur(img_gray, (9, 9), 0)
         img_gray = cv.medianBlur(img_gray, 11)
-        img_gray2 = cv.bilateralFilter(img_gray, 9, 45, 45)
+        img_gray2 = cv.bilateralFilter(img_gray, 9, 49, 49)
 
         hsv_frame = cv.cvtColor(image, cv.COLOR_BGR2HSV)
         print(hsv_frame)
-        edge = cv.Canny(img_gray2, 30, 200)
-        #cv.imshow('image_2', edge)
+        edge = cv.Canny(img_gray2, 10, 200)
+        cv.imshow('image_2', edge)
         # thresholding and opening
         #th3 = cv.adaptiveThreshold(edge, 255, cv.ADAPTIVE_THRESH_MEAN_C, \
          #                         cv.THRESH_BINARY, 99, 46)
@@ -48,19 +48,34 @@ def perform_processing(image: np.ndarray) -> str:
         cont, hier = cv.findContours(edge, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
         #cv.drawContours(image, cont, -1, (0, 200, 0), 2)
         perfect = []
+        min_cont = []       #pierwszy narożnik x z lewej
+        max_cont = []       #ostatni narożnik x z prawej
+        letter_num = []     #numer Bboxa
         area = list()
+        min_y, max_y, min_yr, max_yr = 0, 0, 0, 0
         for contour in cont:                                                                    #metoda na same litery i bounding boxy
             x, y, w, h = cv.boundingRect(contour)
-            if h > w and w*h > 1000 and cv.contourArea(contour)>500:
+            if h > w and w*h > 1500 and cv.contourArea(contour) > 600:
                 cv.rectangle(image, (x, y), (x + w, y + h), (0, 0, 250), 6)
+                perfect.append(contour)
             #cv.imshow('image_2', img_gray2)
-            area.append(cv.contourArea(contour))
-            min_x_cont = np.min(contour[:, :, 0])
-            max_x_cont = np.max(contour[:, :, 0])
-            min_y_cont = np.min(contour[:, :, 1])
-            max_y_cont = np.max(contour[:, :, 1])
-            width = max_x_cont - min_x_cont
-            height = max_y_cont - min_y_cont
+
+                min_x_cont = np.min(contour[:, :, 0])
+                #max_x_cont = np.max(contour[:, :, 0])
+                max_x_cont = x+w
+                min_cont.append(min_x_cont)
+                max_cont.append(max_x_cont)
+                min_cont = sorted(min_cont)
+                max_cont = sorted(max_cont, reverse=True)
+                print(f'Min cont {min_cont}, Max cont {max_cont}')
+                if x == min_cont[0]:
+                    min_y = y
+                    max_y = y+h
+                if x+w == max_cont[0]:
+                    min_yr = y
+                    max_yr = y+h
+            # width = max_x_cont - min_x_cont
+            # height = max_y_cont - min_y_cont
             # if 100000> area[-1] > 10000 and col -50 > (max_x_cont-min_x_cont) > col/3 and\        #metoda wykrywająca całą tablicę
             #                                     row-100 > (max_y_cont-min_y_cont) > row/10 and\
             #                                     (width/height) < 6:
@@ -68,28 +83,30 @@ def perform_processing(image: np.ndarray) -> str:
             #     perfect.append(contour)
             #print(contour)
             #print(f'Min: {min_y_cont}, Max: {max_x_cont}')
-
         area = sorted(area, reverse=True)
         print(area[:10])
 
         rect = np.zeros((4, 2), dtype=np.float32)
-        if len(perfect)>0:
-            min_x_cont = np.min(perfect[0][:, :, 0])
-            max_x_cont = np.max((perfect[0][:, :, 0]))
-            min_y_cont = np.min(perfect[0][:, :, 1])
-            max_y_cont = np.max(perfect[0][:, :, 1])
-        # Obliczenie skrajnych punktów dla transformacji perspektywicznej
-            rect[0] = np.float32([min_x_cont, min_y_cont])
-            rect[1] = np.float32([max_x_cont, min_y_cont])
-            rect[2] = np.float32([max_x_cont, max_y_cont])
-            rect[3] = np.float32([min_x_cont, max_y_cont])
-            width = max_x_cont - min_x_cont
-            height = max_y_cont - min_y_cont
 
+        min_x_tab = min_cont[0]-5
+        max_x_tab = max_cont[0]+5
+        min_y_tab = min_y-5
+        max_y_tab = max_y+5
+        min_yr_tab = min_yr-5
+        max_yr_tab = max_yr+5
+        print(min_yr_tab, max_yr_tab)
+    # Obliczenie skrajnych punktów dla transformacji perspektywicznej
+        rect[0] = np.float32([min_x_tab, min_y_tab])
+        rect[1] = np.float32([max_x_tab, min_yr_tab])
+        rect[2] = np.float32([max_x_tab, max_yr_tab])
+        rect[3] = np.float32([min_x_tab, max_y_tab])
+        width = max_x_tab - min_x_tab
+        height = max_y_tab - min_y_tab
+        print(f'Width {width}, Height {height}')
         dst_rect = np.array([[0, 0], [width, 0], [width, height], [0, height]], dtype=np.float32)
         M = cv.getPerspectiveTransform(rect, dst_rect)
         warped_image = cv.warpPerspective(image, M, (int(width), int(height)))
-        image = cv.resize(image, (0, 0), fx=0.2, fy=0.2)
+        #image = cv.resize(image, (0, 0), fx=0.2, fy=0.2)
 
         cv.imshow('Wyprostowana perspektywa', warped_image)
         cv.imshow('image', image)

@@ -14,30 +14,33 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.impute import SimpleImputer
 from sklearn.neural_network import MLPClassifier
 from joblib import dump
 
 def main():
 
-    raw_data_Y = pd.read_csv('dane2.csv')
-    x_data = pd.read_csv('HOG2.csv')
-    print(raw_data_Y.info())
-    #print(raw_data.describe())
-    print(raw_data_Y.head(10))
-    data = raw_data_Y.copy()
-    #Y = data.iloc[1]
+    raw_data_Y = pd.read_csv('dane2.csv', header=None)
+    x_data = pd.read_csv('data.csv', header=None)
+
+    # df = pd.read_csv('polaczone.csv', header=None)
+
+    # print(raw_data_Y.info())
+    # print(x_data.describe())
+    # print(raw_data_Y.head(10))
     value = []
     for index, row in raw_data_Y.iterrows():
-        value.append( row.iloc[0])
-    Y = value
+        value.append(row.iloc[0])
+    Y = np.ravel(raw_data_Y)
+    # print(f' Y {Y}')
+
     X = x_data
-    print(f' Y {Y}')
-    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.30, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=42)
 
 
     results = dict()
 
-    classif = MLPClassifier(activation='logistic',hidden_layer_sizes=200, max_iter=5000 )
+    classif = MLPClassifier(activation='logistic',hidden_layer_sizes=200, max_iter=50000 )
     linear_svc = LinearSVC()
     clfs = [
         # KNeighborsClassifier,
@@ -56,7 +59,7 @@ def main():
         mdl = Pipeline([
             ('min_max_scaler', MinMaxScaler()),
             ('standard_scaler', StandardScaler()),
-            ('classifier', clf())  # RandomForestClassifier(), LinearSVC(), DecisionTreeClassifier()
+            ('classifier', classif)  # RandomForestClassifier(), LinearSVC(), DecisionTreeClassifier()
         ])
         mdl.fit(X_train, y_train)
         results[clf.__name__] = mdl.score(X_test, y_test)

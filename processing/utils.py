@@ -8,6 +8,7 @@ import imutils
 from skimage.feature import hog
 import matplotlib.pyplot as plt
 from sklearn.neural_network import MLPClassifier
+import csv
 
 
 
@@ -144,7 +145,8 @@ def perform_processing(image: np.ndarray) -> str:
             fd, hog_image = hog(Bbox_gray, orientations=9, pixels_per_cell=(24, 24),
                                 cells_per_block=(2, 2), visualize=True, feature_vector=True)
 
-            directory = r"C:\Users\Andrzej\Desktop\Studia\studia - sem 1 magisterka\SW\SW_Zaliczenie\processing"
+            scores.append(fd)
+            directory = r"C:\Users\Andrzej\Desktop\Studia\studia - sem 1 magisterka\SW\SW_Zaliczenie\processing"            #klasyfikacja gotowych liter/danych z pliku csv
             # Pełna ścieżka do pliku z modelem
             model_path = os.path.join(directory, "klasyfikator.pkl")
             model = load(model_path)
@@ -152,8 +154,8 @@ def perform_processing(image: np.ndarray) -> str:
             letter = model.predict(fd)
             plate_num.append(str(letter[0]))
             licence_plate = ''.join(plate_num)
-            scores.append(fd)
-            last +=1
+
+            # last +=1
     #print(len(scores))
     print(plate_num)
 
@@ -165,19 +167,19 @@ def perform_processing(image: np.ndarray) -> str:
 
     # Ekstrakcja cech features z Histogram of Gradients do csv
 
-    # with open('HOG2.csv', '', newline='\n') as f:
-    #     writer = csv.writer(f)
-    #     for i in scores:
-    #         writer.writerow(i)
-    #     f.close()
+    with open('HOG3.csv', 'a', newline='\n') as f:
+        writer = csv.writer(f)
+        for i in scores:
+            writer.writerow(i)
+        f.close()
 
-    # Przerwa po każdym zdjęciu
+    #Przerwa po każdym zdjęciu
 
-    # key = cv.waitKey(0)
-    # if key == 27:
-    #     cv.destroyAllWindows()
-    #
-    #     exit()
+    key = cv.waitKey(0)
+    if key == 27:
+        cv.destroyAllWindows()
+
+        exit()
     print(f'image.shape: {image.shape}')
     print(licence_plate)
 

@@ -1,4 +1,30 @@
-import numpy as np
-import cv2 as cv
-import os
-import time
+arff==0.9
+async-timeout==4.0.2
+cachetools==5.3.0
+cloudpickle==2.2.1
+colorama==0.4.4
+configobj==5.0.6
+contextlib2==21.6.0
+datamodel-code-generator==0.19.0
+imageio==2.31.0
+importlib-metadata==4.6.4
+importlib-resources==5.12.0
+imutils==0.5.4
+ipykernel==6.22.0
+ipython==7.31.1
+ipython_genutils==0.2.0
+joblib==1.2.0
+jsonpickle==3.0.1
+jsonschema==4.17.3
+jsonschema-spec==0.1.4
+numexpr==2.8.4
+numpy==1.23.5
+oauthlib==3.2.0
+openapi-schema-validator==0.3.4
+openapi-spec-validator==0.5.1
+opencv-contrib-python==4.7.0.72
+opencv-python==4.7.0.72
+orjson==3.8.11
+pickleshare==0.7.5
+scikit-image==0.21.0
+scikit-learn==1.2.2

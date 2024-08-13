@@ -1,4 +1,4 @@
-#PL :poland:
+#PL 🇵🇱
 # Wykrywanie Tablic Rejestracyjnych
 
 Głównym zadaniem programu było wykrycie tablicy rejestracyjnej na zdjęciu oraz rozpoznanie jej numerów rejestracyjnych. W algorytmie skupiono się na odpowiedniej filtracji zdjęcia, wykryciu krawędzi liter, a następnie rozpoznaniu ich za pomocą wytrenowanego modelu klasyfikatora.
@@ -19,7 +19,7 @@ Do wytrenowania modeli stworzono bazę ponad 100 własnych zdjęć, które zosta
 
 W przypadku gdyby żadna z wyżej wymienionych metod nie zadziałała, aby uniknąć błędów zakodowano numer pojazdu "PO70153", co jest wartością losową.
 
-#ENG :england:
+#ENG 🏴󠁧󠁢󠁥󠁮󠁧󠁿
 
 # License Plate Detection
 
